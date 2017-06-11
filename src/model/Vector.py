@@ -22,6 +22,9 @@ class Vector:
     def norm(self) -> float:
         return math.sqrt(sum(map(lambda x: x ** 2, self.components)))
 
+    def dim(self) -> int:
+        return len(self.components)
+
     def __add__(self, other):
         if isinstance(other, Vector):
             self.add(other)
@@ -41,6 +44,9 @@ class Vector:
 
     def __str__(self):
         return self.components.__str__()
+
+    def __iter__(self):
+        return self.components.__iter__()
 
     @staticmethod
     def span(one: 'Vector', two: 'Vector') -> 'Vector':

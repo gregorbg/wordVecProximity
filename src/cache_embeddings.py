@@ -1,9 +1,8 @@
 #! /usr/bin/python3
 import re
-
 import sys
 
-from src.Vector import Vector
+from src.model.Vector import Vector
 
 
 def read_data(filename: str) -> dict:
