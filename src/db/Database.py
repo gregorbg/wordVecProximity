@@ -3,17 +3,17 @@ import pymysql
 
 
 class Database:
-    def __init__(self, conn_args):
-        self.cnx = pymysql.connect(**conn_args)
+    def __init__(self, db: str, host: str, user: str, passwd: str, port: int = 3306):
+        self.cnx = pymysql.connect(host=host, port=port, user=user, passwd=passwd, db=db, autocommit=True)
 
     def read_word_embedding(self, word: str, corpus: str, dim: int) -> Vector:
         cursor = self.cnx.cursor()
         query = (
             "SELECT id "
             "FROM cl_words_cache "
-            "WHERE word = ?"
-            "AND corpus = ? "
-            "AND dim = ?"
+            "WHERE word = %s "
+            "AND corpus = %s "
+            "AND dim = %s"
         )
 
         cursor.execute(query, (word, corpus, dim))
@@ -24,16 +24,13 @@ class Database:
         query = (
             "SELECT `value` "
             "FROM cl_word_components "
-            "WHERE word_id = ?"
+            "WHERE word_id = %s "
             "ORDER BY dim ASC"
         )
 
         cursor.execute(query, word_id)
 
-        components = []
-        for value in cursor:
-            components.append(value)  # FIXME is there a "collect" in Python? Can it work on MySQL cursors?
-
+        components = cursor.fetchall()
         return Vector(*components)
 
     def cache_word_embedding(self, word: str, embedding: Vector, corpus: str):
@@ -41,7 +38,7 @@ class Database:
         query = (
             "INSERT INTO cl_words_cache "
             "(corpus, dim, word) "
-            "VALUES (?, ?, ?)"
+            "VALUES (%s, %s, %s)"
         )
 
         cursor.execute(query, (corpus, embedding.dim(), word))
@@ -49,9 +46,9 @@ class Database:
 
         query = (
             "INSERT INTO cl_word_components "
-            "(word_id, index, `value`) "
-            "VALUES (?, ?, ?)"
+            "(word_id, `index`, `value`) "
+            "VALUES (%s, %s, %s)"
         )
 
-        for (index, component) in enumerate(embedding):
+        for index, component in enumerate(embedding):
             cursor.execute(query, (insert_id, index, component))

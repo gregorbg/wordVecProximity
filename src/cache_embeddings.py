@@ -3,6 +3,7 @@ import re
 import sys
 
 from src.model.Vector import Vector
+from src.db.Database import Database
 
 
 def read_data(filename: str) -> dict:
@@ -56,16 +57,15 @@ def matches(words: dict, a: str, b: str, c: str, d: str) -> bool:
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        sys.stderr.write('Please specify a data input file and a test input file!')
-        exit(1)
+    file = "/home/suushie_maniac/Schreibtisch/German-cca-100-11.txt"
 
-    if re.match('.*-brown-.*', sys.argv[0]):
+    if re.match('.*-brown-.*', file):
         sys.stderr.write('nope.')
         exit(255)
 
-    tests = read_tests(sys.argv[0])
-    data = read_data(sys.argv[1])
+    data = read_data(file)
+    db = Database('cl-cache', 'localhost', 'root', 'localsql')
 
-    for test in tests:
-        print(match_threshold(data, *test))
+    for word, embedding in data.items():
+        print(word)
+        db.cache_word_embedding(word, embedding, 'cca')
