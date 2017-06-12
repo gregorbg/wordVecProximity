@@ -1,4 +1,6 @@
+from typing import Dict
 from src.model.Vector import Vector
+
 import pymysql
 
 
@@ -17,21 +19,41 @@ class Database:
         )
 
         cursor.execute(query, (word, corpus, dim))
-        res = cursor.fetchone()
+        (word_id) = cursor.fetchone()
 
-        word_id = res["word_id"]
+        return self._word_from_db_id(word_id)
 
+    def _word_from_db_id(self, word_id: int) -> Vector:
+        cursor = self.cnx.cursor()
         query = (
             "SELECT `value` "
             "FROM cl_word_components "
             "WHERE word_id = %s "
-            "ORDER BY dim ASC"
+            "ORDER BY `index` ASC"
         )
 
         cursor.execute(query, word_id)
 
-        components = cursor.fetchall()
+        components = map(lambda t: (t or [None])[0], cursor.fetchall())  # hacky way to unpack single-element tuples
         return Vector(*components)
+
+    def read_corpus(self, corpus: str, dim: int) -> Dict[str, Vector]:
+        cursor = self.cnx.cursor()
+        query = (
+            "SELECT `id`, word "
+            "FROM cl_words_cache "
+            "WHERE corpus = %s "
+            "AND dim = %s"
+        )
+
+        cursor.execute(query, (corpus, dim))
+        db_words = cursor.fetchall()
+
+        words = {}
+        for (word_id, word_str) in db_words:
+            words[word_str] = self._word_from_db_id(word_id)
+
+        return words
 
     def cache_word_embedding(self, word: str, embedding: Vector, corpus: str):
         cursor = self.cnx.cursor()
