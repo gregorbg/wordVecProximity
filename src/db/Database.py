@@ -82,4 +82,4 @@ class Database:
         )
 
         for index, component in enumerate(embedding):
-            cursor.execute(query, (insert_id, index, component))
+            cursor.execute(query, (insert_id, index, component.item()))
