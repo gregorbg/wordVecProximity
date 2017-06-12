@@ -11,9 +11,9 @@ from src.db.Database import Database
 def read_file_data(filename: str) -> dict:
     words = {}
 
-    with open(filename, "r") as file:
-        for line in file:
-            values = line.split()
+    with open(filename, "r") as fs_file:
+        for f_line in fs_file:
+            values = f_line.split()
 
             if len(values) > 2:
                 words[values[0]] = Vector(*map(float, values[1:]))
@@ -21,11 +21,11 @@ def read_file_data(filename: str) -> dict:
     return words
 
 
-def read_lzma_data(file: lzma.LZMAFile) -> dict:
+def read_lzma_data(lzma_file: lzma.LZMAFile) -> dict:
     words = {}
 
-    for line in file:
-        values = line.split()
+    for lzma_line in lzma_file:
+        values = lzma_line.split()
 
         if len(values) > 2:
             words[values[0]] = Vector(*map(float, values[1:]))
@@ -54,9 +54,10 @@ if __name__ == "__main__":
 
         lang = line.group(3)
         corpus = line.group(4)
+        dim = line.group(5)
         window = line.group(6)
 
-        if lang in ["German", "English", "French"] and corpus != "brown":
+        if lang in ["German", "English", "French"] and corpus != "brown" and dim == "10":
             xz = requests.get(link, stream=True)
 
             with lzma.LZMAFile(BytesIO(xz.content)) as f:
@@ -66,6 +67,6 @@ if __name__ == "__main__":
 
                 for word, embedding in data.items():
                     print(word)
-                    db.cache_word_embedding(word, embedding, corpus, lang)
+                    db.cache_word_embedding(word, embedding, corpus, lang, window)
 
                 db.commit()

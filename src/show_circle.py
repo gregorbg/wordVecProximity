@@ -6,7 +6,7 @@ if __name__ == "__main__":
     print("Hello, World!")
 
     db = Database('cl-cache', 'localhost', 'root', 'localsql')
-    corpus = db.read_corpus('cca', 'de', 100)
+    corpus = db.read_corpus('cca', 'de', 100, 11)
 
     oneA = corpus['Fohlen']
     twoA = corpus['Pferd']
