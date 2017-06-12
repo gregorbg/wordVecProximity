@@ -8,6 +8,13 @@ class Database:
     def __init__(self, db: str, host: str, user: str, passwd: str, port: int = 3306):
         self.cnx = pymysql.connect(host=host, port=port, user=user, passwd=passwd, db=db, autocommit=True)
 
+    def begin_transaction(self):
+        self.cnx.autocommit(False)
+
+    def commit(self):
+        self.cnx.commit()
+        self.cnx.autocommit(True)
+
     def read_word_embedding(self, word: str, corpus: str, lang: str, dim: int) -> Vector:
         cursor = self.cnx.cursor()
         query = (
