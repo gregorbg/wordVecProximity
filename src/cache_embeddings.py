@@ -37,6 +37,10 @@ if __name__ == "__main__":
     data = read_data(file)
     db = Database('cl-cache', 'localhost', 'root', 'localsql')
 
+    db.begin_transaction()
+
     for word, embedding in data.items():
         print(word)
         db.cache_word_embedding(word, embedding, 'cca', 'de')
+
+    db.commit()
