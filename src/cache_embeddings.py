@@ -39,4 +39,4 @@ if __name__ == "__main__":
 
     for word, embedding in data.items():
         print(word)
-        db.cache_word_embedding(word, embedding, 'cca')
+        db.cache_word_embedding(word, embedding, 'cca', 'de')
