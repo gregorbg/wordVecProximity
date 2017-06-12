@@ -1,6 +1,6 @@
 #! /usr/bin/python3
-from src.db.Database import Database
-from src.model.Vector import Vector
+from .db.Database import Database
+from .model.Vector import Vector
 
 if __name__ == "__main__":
     print("Hello, World!")

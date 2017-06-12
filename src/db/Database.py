@@ -1,5 +1,5 @@
 from typing import Dict
-from src.model.Vector import Vector
+from ..model.Vector import Vector
 
 import pymysql
 
