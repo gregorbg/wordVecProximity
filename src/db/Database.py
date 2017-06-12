@@ -15,7 +15,7 @@ class Database:
         self.cnx.commit()
         self.cnx.autocommit(True)
 
-    def read_word_embedding(self, word: str, corpus: str, lang: str, dim: int) -> Vector:
+    def read_word_embedding(self, word: str, corpus: str, lang: str, dim: int, window: int) -> Vector:
         cursor = self.cnx.cursor()
         query = (
             "SELECT id "
@@ -23,10 +23,11 @@ class Database:
             "WHERE word = %s "
             "AND corpus = %s "
             "AND lang = %s "
-            "AND dim = %s"
+            "AND dim = %s "
+            "AND window = %s"
         )
 
-        cursor.execute(query, (word, corpus, lang, dim))
+        cursor.execute(query, (word, corpus, lang, dim, window))
         (word_id) = cursor.fetchone()
 
         return self._word_from_db_id(word_id)
@@ -45,17 +46,18 @@ class Database:
         components = map(lambda t: (t or [None])[0], cursor.fetchall())  # hacky way to unpack single-element tuples
         return Vector(*components)
 
-    def read_corpus(self, corpus: str, lang:str, dim: int) -> Dict[str, Vector]:
+    def read_corpus(self, corpus: str, lang: str, dim: int, window: int) -> Dict[str, Vector]:
         cursor = self.cnx.cursor()
         query = (
             "SELECT `id`, word "
             "FROM cl_words_cache "
             "WHERE corpus = %s "
             "AND lang = %s "
-            "AND dim = %s"
+            "AND dim = %s "
+            "AND window = %s"
         )
 
-        cursor.execute(query, (corpus, lang, dim))
+        cursor.execute(query, (corpus, lang, dim, window))
         db_words = cursor.fetchall()
 
         words = {}
@@ -64,15 +66,15 @@ class Database:
 
         return words
 
-    def cache_word_embedding(self, word: str, embedding: Vector, corpus: str, lang: str):
+    def cache_word_embedding(self, word: str, embedding: Vector, corpus: str, lang: str, window: int):
         cursor = self.cnx.cursor()
         query = (
             "INSERT INTO cl_words_cache "
-            "(corpus, dim, word, lang) "
-            "VALUES (%s, %s, %s, %s)"
+            "(corpus, lang, dim, window, word) "
+            "VALUES (%s, %s, %s, %s, %s)"
         )
 
-        cursor.execute(query, (corpus, embedding.dim(), word, lang))
+        cursor.execute(query, (corpus, lang, embedding.dim(), window, word))
         insert_id = cursor.lastrowid
 
         query = (
