@@ -19,35 +19,6 @@ def read_data(filename: str) -> dict:
     return words
 
 
-def read_tests(filename: str) -> list:
-    cases = []
-
-    with open(filename, "r") as file:
-        for line in file:
-            values = re.findall('(.*):(.*) => (.*):(.*)', line)
-
-            if len(values) == 1:
-                cases.append(values[0])
-
-    return cases
-
-
-def analogy(words: dict, a: str, b: str, c: str) -> list:
-    check_dist = Vector.distance(words[a], words[b])
-    distances = {}
-    candidates = []
-
-    for key in words.keys():
-        if key != c:
-            distances[key] = Vector.distance(words[c], words[key])
-
-    for key in distances.keys():
-        if abs(check_dist - distances[key]) <= 0.01:
-            candidates.append((key, distances[key]))
-
-    return sorted(candidates, key=lambda x: x[1])
-
-
 def match_threshold(words: dict, a: str, b: str, c: str, d: str) -> float:
     return Vector.distance(words[c].add(Vector.span(words[a], words[b])), words[d])
 
