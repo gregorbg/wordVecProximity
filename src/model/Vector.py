@@ -1,29 +1,32 @@
-import math
+import numpy as np
 
 
 class Vector:
     def __init__(self, *components: float):
-        self.components = list(components)
+        self.np_vec = np.array(list(components))
 
     def scale(self, scalar: int) -> 'Vector':
-        self.components = list(map(lambda x: x * scalar, self.components))
+        self.np_vec = self.np_vec * scalar
         return self
 
     def add(self, other: 'Vector') -> 'Vector':
-        self.components = list(map(lambda z: z[0] + z[1], zip(self.components, other.components)))
+        self.np_vec = self.np_vec + other.np_vec
         return self
 
     def sub(self, other: 'Vector') -> 'Vector':
         return self.add(other.scale(-1))
 
     def dot(self, other: 'Vector') -> float:
-        return sum(map(lambda z: z[0] + z[1], zip(self.components, other.components)))
+        return self.np_vec.dot(other.np_vec)
 
     def norm(self) -> float:
-        return math.sqrt(sum(map(lambda x: x ** 2, self.components)))
+        return np.linalg.norm(self.np_vec)
 
     def dim(self) -> int:
-        return len(self.components)
+        return self.np_vec.size
+
+    def in_radius(self, center: 'Vector', radius: float) -> bool:
+        return Vector.distance(center, self) <= radius
 
     def __add__(self, other):
         if isinstance(other, Vector):
@@ -43,14 +46,14 @@ class Vector:
             return self
 
     def __str__(self):
-        return self.components.__str__()
+        return self.np_vec.__str__()
 
     def __iter__(self):
-        return self.components.__iter__()
+        return self.np_vec.__iter__()
 
     @staticmethod
     def span(one: 'Vector', two: 'Vector') -> 'Vector':
-        return Vector(*map(lambda z: z[0] - z[1], zip(two.components, one.components)))
+        return Vector(* two - one)
 
     @staticmethod
     def distance(one: 'Vector', two: 'Vector') -> float:
