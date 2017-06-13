@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, Tuple
 from src.model.Vector import Vector
 
 import pymysql
@@ -65,6 +65,23 @@ class Database:
             words[word_str] = self._word_from_db_id(word_id)
 
         return words
+
+    def yield_corpus(self, corpus: str, lang: str, dim: int, window: int) -> Tuple[str, Vector]:
+        cursor = self.cnx.cursor()
+        query = (
+            "SELECT `id`, word "
+            "FROM cl_words_cache "
+            "WHERE corpus = %s "
+            "AND lang = %s "
+            "AND dim = %s "
+            "AND window = %s"
+        )
+
+        cursor.execute(query, (corpus, lang, dim, window))
+        db_words = cursor.fetchall()
+
+        for (word_id, word_str) in db_words:
+            yield (word_str, self._word_from_db_id(word_id))
 
     def cache_word_embedding(self, word: str, embedding: Vector, corpus: str, lang: str, window: int):
         cursor = self.cnx.cursor()
