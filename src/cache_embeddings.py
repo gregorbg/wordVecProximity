@@ -4,8 +4,8 @@ import re
 import requests
 
 from io import BytesIO
-from .model.Vector import Vector
-from .db.Database import Database
+from src.model.Vector import Vector
+from src.db.Database import Database
 
 
 def read_file_data(filename: str) -> dict:
