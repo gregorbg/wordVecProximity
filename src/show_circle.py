@@ -5,20 +5,29 @@ from src.model.Vector import Vector
 if __name__ == "__main__":
     print("Hello, World!")
 
-    db = Database('cl-cache', 'localhost', 'root', 'localsql')
-    corpus = db.read_corpus('cca', 'de', 100, 11)
+    db = Database('cl-cache', 'db.suushiemaniac.com', 'cl2', 'wordembeddings')
+    print("Database connected")
 
-    oneA = corpus['Fohlen']
-    twoA = corpus['Pferd']
+    corpus = "cca"
+    lang = "English"
+    dim = 10
+    window = 5
 
-    oneB = corpus['Kalb']
-    twoB = corpus['Rind']
+    oneA = db.read_word_embedding('man', corpus, lang, dim, window)
+    twoA = db.read_word_embedding('woman', corpus, lang, dim, window)
+
+    oneB = db.read_word_embedding('king', corpus, lang, dim, window)
+    twoB = db.read_word_embedding('queen', corpus, lang, dim, window)
+
+    print("words cached")
 
     diffMaster = Vector.span(oneA, twoA)
     res = oneB.add(diffMaster)
 
     dist = Vector.span(twoB, res)
 
-    for word, embedding in corpus.items():
+    print("references calculated")
+
+    for word, embedding in db.yield_corpus(corpus, lang, dim, window):
         if embedding.in_radius(twoB, dist.norm()):
             print(word)

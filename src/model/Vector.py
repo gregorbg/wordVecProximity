@@ -6,12 +6,10 @@ class Vector:
         self.np_vec = np.array(list(components))
 
     def scale(self, scalar: int) -> 'Vector':
-        self.np_vec = self.np_vec * scalar
-        return self
+        return Vector(* self.np_vec * scalar)
 
     def add(self, other: 'Vector') -> 'Vector':
-        self.np_vec = self.np_vec + other.np_vec
-        return self
+        return Vector(* self.np_vec + other.np_vec)
 
     def sub(self, other: 'Vector') -> 'Vector':
         return self.add(other.scale(-1))
@@ -30,20 +28,17 @@ class Vector:
 
     def __add__(self, other):
         if isinstance(other, Vector):
-            self.add(other)
-            return self
+            return self.add(other)
 
     def __sub__(self, other):
         if isinstance(other, Vector):
-            self.sub(other)
-            return self
+            return self.sub(other)
 
     def __mul__(self, other):
         if isinstance(other, Vector):
             return self.dot(other)
         elif isinstance(other, int):
-            self.scale(other)
-            return self
+            return self.scale(other)
 
     def __str__(self):
         return self.np_vec.__str__()
